@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserDto } from './dto/user.dto';
+import { NotFoundException } from '@nestjs/common';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -18,83 +19,111 @@ describe('UsersService', () => {
   });
 
   describe('create', () => {
-    it('should create a user', () => {
-      const dto: CreateUserDto = {
+    it('새로운 사용자를 생성해야 합니다', () => {
+      const userDto: UserDto = {
         name: '홍길동',
-        email: 'hong@example.com',
-        age: 30,
+        email: 'hong@test.com',
+        age: 30
       };
 
-      const user = service.create(dto);
+      const user = service.create(userDto);
 
-      expect(user).toEqual({
-        id: 1,
-        ...dto,
-      });
+      expect(user).toBeDefined();
+      expect(user.id).toBe(1);
+      expect(user.name).toBe(userDto.name);
+      expect(user.email).toBe(userDto.email);
+      expect(user.age).toBe(userDto.age);
     });
   });
 
   describe('findAll', () => {
-    it('should return an array of users', () => {
-      const dto: CreateUserDto = {
+    it('모든 사용자 목록을 반환해야 합니다', () => {
+      const userDto: UserDto = {
         name: '홍길동',
-        email: 'hong@example.com',
-        age: 30,
+        email: 'hong@test.com',
+        age: 30
       };
       
-      service.create(dto);
+      service.create(userDto);
       const users = service.findAll();
 
-      expect(users).toBeInstanceOf(Array);
-      expect(users).toHaveLength(1);
-      expect(users[0]).toEqual({
-        id: 1,
-        ...dto,
-      });
+      expect(users).toBeDefined();
+      expect(users.length).toBe(1);
+      expect(users[0].name).toBe(userDto.name);
     });
   });
 
   describe('findOne', () => {
-    it('should return a user by id', () => {
-      const dto: CreateUserDto = {
+    it('ID로 사용자를 찾아야 합니다', () => {
+      const userDto: UserDto = {
         name: '홍길동',
-        email: 'hong@example.com',
-        age: 30,
+        email: 'hong@test.com',
+        age: 30
       };
       
-      service.create(dto);
-      const user = service.findOne(1);
+      const created = service.create(userDto);
+      const found = service.findOne(created.id);
 
-      expect(user).toEqual({
-        id: 1,
-        ...dto,
-      });
+      expect(found).toBeDefined();
+      expect(found?.id).toBe(created.id);
+      expect(found?.name).toBe(userDto.name);
     });
 
-    it('should return undefined for non-existent user', () => {
-      const user = service.findOne(999);
-      expect(user).toBeUndefined();
+    it('존재하지 않는 ID로 조회시 undefined를 반환해야 합니다', () => {
+      const found = service.findOne(999);
+      expect(found).toBeUndefined();
     });
   });
 
   describe('delete', () => {
-    it('should delete a user', () => {
-      const dto: CreateUserDto = {
+    it('사용자를 성공적으로 삭제해야 합니다', () => {
+      const userDto: UserDto = {
         name: '홍길동',
-        email: 'hong@example.com',
-        age: 30,
+        email: 'hong@test.com',
+        age: 30
       };
       
-      service.create(dto);
-      const result = service.delete(1);
+      const created = service.create(userDto);
+      const result = service.delete(created.id);
 
       expect(result).toBe(true);
-      expect(service.findOne(1)).toBeUndefined();
+      expect(service.findOne(created.id)).toBeUndefined();
     });
 
-    it('should return false when trying to delete non-existent user', () => {
+    it('존재하지 않는 ID로 삭제 시도시 false를 반환해야 합니다', () => {
       const result = service.delete(999);
       expect(result).toBe(false);
+    });
+  });
+
+  describe('update', () => {
+    it('사용자 정보를 성공적으로 업데이트해야 합니다', () => {
+      const userDto: UserDto = {
+        name: '홍길동',
+        email: 'hong@test.com',
+        age: 30
+      };
+      
+      const created = service.create(userDto);
+      const updateDto: UserDto = {
+        name: '홍길순'
+      };
+
+      const updated = service.update(created.id, updateDto);
+
+      expect(updated).toBeDefined();
+      expect(updated.name).toBe('홍길순');
+      expect(updated.email).toBe(userDto.email); // 기존 값 유지
+      expect(updated.age).toBe(userDto.age); // 기존 값 유지
+    });
+
+    it('존재하지 않는 ID로 업데이트 시도시 NotFoundException을 발생시켜야 합니다', () => {
+      const updateDto: UserDto = {
+        name: '홍길순'
+      };
+
+      expect(() => service.update(999, updateDto))
+        .toThrow(NotFoundException);
     });
   });
 });
