@@ -10,7 +10,7 @@ async function bootstrap() {
 
   // CORS 설정
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://nestjstest.netlify.app'],
+    origin: ['http://localhost:3000', 'https://glittering-longma-fbadb7.netlify.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
