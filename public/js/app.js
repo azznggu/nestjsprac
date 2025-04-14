@@ -1,4 +1,7 @@
-const API_BASE_URL = 'http://localhost:3000';
+// API 기본 URL 설정
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000'
+    : 'https://nestjstest.netlify.app'; // 여기에 실제 백엔드 URL을 입력하세요
 
 // API 응답을 표시하는 유틸리티 함수
 function showApiResponse(response, error = false) {
