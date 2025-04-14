@@ -9,7 +9,11 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // CORS 설정
-  app.enableCors();
+  app.enableCors({
+    origin: ['http://localhost:3000', 'https://nestjstest.netlify.app'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
   // 정적 파일 서빙 설정
   app.useStaticAssets(join(__dirname, '..', 'public'));
@@ -24,16 +28,16 @@ async function bootstrap() {
 
   // Swagger 설정
   const config = new DocumentBuilder()
-    .setTitle('NestJS API 예제')
-    .setDescription('NestJS로 만든 샘플 API 문서입니다.')
+    .setTitle('NestJS API')
+    .setDescription('NestJS로 구현한 사용자 및 주문 관리 API')
     .setVersion('1.0')
-    .addTag('users')
-    .addTag('orders')
     .build();
   
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, document);
+  SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
