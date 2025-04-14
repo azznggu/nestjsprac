@@ -1,22 +1,28 @@
+import { IsString, IsEmail, IsNumber, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateUserDto {
+export class UserDto {
+  @IsString()
+  @IsOptional()
   @ApiProperty({
     description: '사용자 이름',
     example: '홍길동'
   })
-  readonly name: string;
+  name?: string;
 
+  @IsEmail()
+  @IsOptional()
   @ApiProperty({
     description: '이메일 주소',
     example: 'hong@example.com'
   })
-  readonly email: string;
+  email?: string;
 
+  @IsNumber()
+  @IsOptional()
   @ApiProperty({
     description: '나이',
-    example: 30,
-    minimum: 0
+    example: 30
   })
-  readonly age: number;
+  age?: number;
 } 
